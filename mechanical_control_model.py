@@ -5,8 +5,7 @@ from PersonFile import Person
 
 
 def single_simulation(algorithm, number_of_people, number_of_floors, max_elevator_capacity=6,
-                      animate=True,
-                      animation_speed=0.1):
+                      animate=True, animation_speed=0.1):
     """
 
     :param algorithm:   This is the algorithm by which the elevator makes decisions about which

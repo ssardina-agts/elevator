@@ -27,7 +27,7 @@ class Person:
 
     def waiting(self):
         """
-        Returns True if the person is not in the elevator, and they have not got where they are goin
+        Returns True if the person is not in the elevator, and they have not got where they are going
         :return: boolean of whether or not the person is waiting for the lift
         """
         return not self.in_elevator and not self.finished
