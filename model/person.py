@@ -11,13 +11,13 @@ class Person:
         self.animation = None  # this stores the canvas object for each person
         self.id = Person.population
         Person.population += 1
-        self.start_floor = random.randint(0, floors-1)
+        self.current_floor = random.randint(0, floors-1)
         self.target_floor = random.randint(0, floors-1)
-        while self.start_floor == self.target_floor:
+        while self.current_floor == self.target_floor:
             self.target_floor = random.randint(0, floors-1)
-        self.direction = (1 if self.start_floor < self.target_floor else -1)
+        self.direction = (1 if self.current_floor < self.target_floor else -1)
         # self.distance = floorheight * (self.start_floor - self.target_floor)
-        self.finished = False
+        self.arrived = False
         self.in_elevator = False
         self.wait_time = 0
         self.elevator_spot = False
@@ -30,4 +30,4 @@ class Person:
         Returns True if the person is not in the elevator, and they have not got where they are going
         :return: boolean of whether or not the person is waiting for the lift
         """
-        return not self.in_elevator and not self.finished
+        return not self.in_elevator and not self.arrived

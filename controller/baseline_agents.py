@@ -11,18 +11,27 @@ class Baseline(Agent):
     def __init__(self):
         super().__init__("Baseline Agent")
 
-    def initialised(self, state: State):
-        self._logger.info("Responded to initialisation.")
+    # def initialised(self, state: State):
+    #     self._logger.info("Responded to initialisation.")
 
     def next_actions(self, state: State) -> dict:
-        if elevator_floor == 0:
-            elevator_direction = 1
-            target_floor = number_of_floors - 1
-        elif elevator_floor == number_of_floors - 1:
-            elevator_direction = -1
-            target_floor = 0
-        return action
+        directions = []
+        targets = []
+        for car in state.status['cars']:
+            if car.floor != 0 and car.floor != state.status['floors_number'] - 1:
+                directions.append(car.direction)
+                if car.direction == 1:
+                    targets.append(state.status['floors_number'] - 1)
+                else:
+                    targets.append(0)
+            elif car.floor == 0:
+                directions.append(1)
+                targets.append(state.status['floors_number'] - 1)
+            else:
+                directions.append(-1)
+                targets.append(0)
 
+        return {"directions": directions, "targets": targets}
 
 # if algorithm == "baseline":
 #     if elevator_floor == 0:
