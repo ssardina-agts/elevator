@@ -18,14 +18,14 @@ class Agent(ABC):
     def name(self, value):
         self._name = value
 
-    @abstractmethod
-    def initialised(self, state: State):
-        """
-        Called when the simulator is initialised.
-        :type state: Initial state of the system.
-        :return:
-        """
-        raise NotImplementedError()
+    # @abstractmethod
+    # def initialised(self, state: State):
+    #     """
+    #     Called when the simulator is initialised.
+    #     :type state: Initial state of the system.
+    #     :return:
+    #     """
+    #     raise NotImplementedError()
 
     @abstractmethod
     def next_actions(self, state: State) -> dict:
