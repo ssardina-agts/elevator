@@ -29,3 +29,14 @@ class State(object):
     @status.setter
     def status(self, value: dict):
         self._status = value
+
+    def print(self):
+        print('\nstatus')
+        idx=0
+        for person in self._status['people']:
+            print('\nperson '+str(idx))
+            person.print()
+        idx = 0
+        for car in self._status['cars']:
+            print('\ncar ' + str(idx))
+            car.print()
