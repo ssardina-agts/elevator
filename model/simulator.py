@@ -8,9 +8,9 @@ class Simulator(object):
     def __init__(self, people_number=2, floors_number=2, info_cars=None):
         if info_cars is None:
             info_cars = {"car_number": 1, "capacity": [1]}
-        self._people_number=people_number
-        self._floors_number=floors_number
-        self._info_cars=info_cars
+        self._people_number = people_number
+        self._floors_number = floors_number
+        self._info_cars = info_cars
         self._all_done = False
         self._state = State(self._people_number, self._floors_number, self._info_cars)
         self._agent = None
@@ -34,8 +34,18 @@ class Simulator(object):
         # Ideally, copy should be implemented within the state class to only copy relevant variables.
         # status = copy.deepcopy(self._state.status)
 
+        print('INITIAL STATE:')
+        self._state.print()
+
         while self._state.status['arrived_people_number'] < self._people_number:
+
+            # get the actions per car
+            actions = self._agent.next_actions(self._state)
+            # for idx in range(self._info_cars['car_number']):
+            #     self._state.status['cars'][idx].direction = actions['directions'][idx]
+            idx_car = 0
             for car in self._state.status['cars']:
+                car.direction = actions['directions'][idx_car]
                 for person in self._state.status['people']:
                     # This measures the wait time of each person by one unit everytime the lift moves
                     # It includes time spent in the lift. It only stops counting when they have arrived
@@ -43,20 +53,24 @@ class Simulator(object):
                         person.wait_time += 1
 
                         if car.floor == person.current_floor:
-                            if person.in_elevator:
+                            if person.in_car:
                                 if car.floor == person.target_floor:
-                                    person.in_elevator = False
+                                    person.in_car = False
                                     person.arrived = True
                                     car.in_people -= 1
-                                    self._state.status['arrived_people_number']+=1
+                                    self._state.status['arrived_people_number'] += 1
                                 else:
                                     person.current_floor += car.direction
                             else:
                                 if not car.full and car.direction == person.direction:
-                                    person.in_elevator = True
+                                    person.in_car = True
+                                    person.current_floor += car.direction
                                     car.in_people += 1
-                car.floor += car.direction
 
+                car.floor += actions['directions'][idx_car]
+            self._state.print()
+            # for idx in range(self._info_cars['car_number']):
+            #     self._state.status['cars'][idx].floor += actions['directions'][idx]
 
         #             if not car.full and not person.arrived and car.floor==person.current_floor:
         #                 # This is the routine for a person leaving the elevator on their desired floor

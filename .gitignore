@@ -1,6 +1,6 @@
 ## idea folder pycharm project
 **/.idea
-**/.__pycache__
+**/__pycache__
 
 ## Google docs
 *.gdoc
