@@ -11,27 +11,77 @@ class Baseline(Agent):
     def __init__(self):
         super().__init__("Baseline Agent")
 
-    # def initialised(self, state: State):
-    #     self._logger.info("Responded to initialisation.")
-
     def next_actions(self, state: State) -> dict:
         directions = []
         targets = []
         for car in state.status['cars']:
-            if car.floor != 0 and car.floor != state.status['floors_number'] - 1:
+            if car.current_floor != 0 and car.current_floor != state.floors_number - 1:
                 directions.append(car.direction)
                 if car.direction == 1:
-                    targets.append(state.status['floors_number'] - 1)
+                    targets.append(state.floors_number- 1)
                 else:
                     targets.append(0)
-            elif car.floor == 0:
+            elif car.current_floor == 0:
                 directions.append(1)
-                targets.append(state.status['floors_number'] - 1)
+                targets.append(state.floors_number - 1)
             else:
                 directions.append(-1)
                 targets.append(0)
 
         return {"directions": directions, "targets": targets}
+
+
+class Efficient(Agent):
+    def __init__(self):
+        super().__init__("Efficient Agent")
+
+    def next_actions(self, state: State) -> dict:
+        directions = []
+        targets = []
+
+        elevator_buttons = [False] * state.floors_number  # reset elevator buttons
+
+        for person in state.status['people']:
+            if person.in_car:
+                elevator_buttons[person.target_floor] = True
+        floors_people_want_to_go_to = [i for i in range(len(elevator_buttons)) if
+                                       elevator_buttons[i]]  # in elevator
+        for car in state.status['cars']:
+            if not car.full:
+                floors_people_want_to_go_to.extend([floor for floor in range(state.floors_number) if
+                                                    bool(state.floor_population[floor])])  # on floors
+            highest_floor = max(floors_people_want_to_go_to)
+            lowest_floor = min(floors_people_want_to_go_to)
+            if car.direction == -1:
+                target_floor = lowest_floor
+            else:
+                target_floor = highest_floor
+            elevator_direction = -1 if target_floor < car.current_floor else 1
+            if car.current_floor == target_floor:
+                elevator_direction *= -1
+
+            directions.append(elevator_direction)
+            targets.append(target_floor)
+
+        return {"directions": directions, "targets": targets}
+
+        # elevator_buttons = [False] * number_of_floors  # reset elevator buttons
+        # for person in elevator_population:
+        #     elevator_buttons[person.target_floor] = True
+        # floors_people_want_to_go_to = [i for i in range(len(elevator_buttons)) if
+        #                                elevator_buttons[i]]  # in elevator
+        # if len(elevator_population) < max_elevator_capacity:
+        #     floors_people_want_to_go_to.extend([floor for floor in range(number_of_floors) if
+        #                                         bool(floor_population[floor])])  # on floors
+        # highest_floor = max(floors_people_want_to_go_to)
+        # lowest_floor = min(floors_people_want_to_go_to)
+        # if elevator_direction == -1:
+        #     target_floor = lowest_floor
+        # elif elevator_direction == 1:
+        #     target_floor = highest_floor
+        # elevator_direction = -1 if target_floor < elevator_floor else 1
+        # if elevator_floor == target_floor:
+        #     elevator_direction *= -1
 
 # if algorithm == "baseline":
 #     if elevator_floor == 0:
