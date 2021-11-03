@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     # These are examples of simulations you could run. The heatmap ones take a while to calculate
     # for i in range(10):
-    single_simulation(algorithm="baseline", number_of_people=10, number_of_floors=4,
+    single_simulation(algorithm="efficient", number_of_people=4, number_of_floors=4,
                   max_elevator_capacity=1, animate=True, animation_speed=0.8)
     # for i in range(10):
     #     single_simulation(algorithm="efficient", number_of_people=5, number_of_floors=10,
