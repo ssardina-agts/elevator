@@ -5,6 +5,8 @@ import copy
 
 
 import logging
+
+
 class Simulator(object):
 
     def __init__(self, people_number=2, floors_number=2, cars=[1]):
@@ -34,39 +36,44 @@ class Simulator(object):
             actions = self._agent.next_actions(self._state)
             logging.info(f"Actions returned by controller for step {sim_step}: {actions}")
 
+
             for car in self._state.cars:
                 car.go(actions[car.id][0], actions[car.id][1])
 
                 for person in self._state.people:
+                    # process people inside the car
+                    #TODO: this must be wrong, which car?
                     if person.in_car:
+                        # person has arrived to destination
                         if car.current_floor == person.target_floor:
                             person.in_car = False
                             person.arrived = True
+                            person.arrived_step = sim_step
+                            person.current_floor += car.current_floor
+
                             car.in_people -= 1
+
                             self._state.floor_population[car.current_floor] -= 1
                             self._state.num_arrived += 1
                             self._display.arriving_person(person, car)
-
                         else:
-                            person.current_floor += car.direction
+                            # This measures the wait time of each person by one unit everytime the lift moves
+                            # It includes time spent in the lift. It only stops counting when they have arrived
                             person.wait_time += 1
-
-                for person in self._state.people:
-                    # This measures the wait time of each person by one unit everytime the lift moves
-                    # It includes time spent in the lift. It only stops counting when they have arrived
-                    if not person.arrived and not person.in_car:
+                    elif not person.arrived:    # process people outside cars waiting in floors
+                        person.wait_time += 1
                         if car.current_floor == person.current_floor and not car.full and car.direction == person.direction:
+                            # process people waiting that can board the car
                             person.in_car = True
-                            person.current_floor += car.direction
+                            person.current_floor = -1   # signal person is inside car
+                            person.boarding_step = sim_step
+
                             car.in_people += 1
                             self._display.in_car(person, car)
-                        person.wait_time += 1
-
-                car.go(actions[car.id][0], actions[car.id][1])
 
             # now time to display...
             self._display.iteraction()
-            logging.info(f"Reporting state at simulation step {sim_step}: \n {str(self._state)}")
+            logging.info(f"Reporting state at simulation step {sim_step}:\n{str(self._state)}")
 
         # end of simulation, show wait times and finish...
         logging.info(f"Waiting times: {self._state.wait_times}")
