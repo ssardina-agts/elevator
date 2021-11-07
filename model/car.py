@@ -3,8 +3,9 @@ class Car(object):
     A class to store the floor position (floor) and the max capacity of a elevator
     """
 
-    def __init__(self, id, target_floor=0, current_floor=0, capacity=1, direction=0):
+    def __init__(self, id, max_floor, target_floor=0, current_floor=0, capacity=1, direction=0):
         self._id = id
+        self._max_floor = max_floor
         self._current_floor = current_floor
         self._target_floor = target_floor
         self._capacity = capacity
@@ -63,6 +64,7 @@ class Car(object):
     def go(self, direction, target):
         self._direction = direction
         self._target_floor = target
+        self._current_floor = max(0, min(self._current_floor + self._direction, self._max_floor))
 
     def stop(self):
         self._direction = 0
