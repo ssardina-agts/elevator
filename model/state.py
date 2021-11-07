@@ -1,3 +1,4 @@
+import logging
 from model.person import Person
 from model.car import Car
 
@@ -54,7 +55,7 @@ class State(object):
         self._wait_times = []
         for person in self.people:
             if not person.arrived:
-                print('Somethings gone wrong')
+                logging.warning(f'Something has gone wrong with person {person.id}: has not arrived!')
             self._wait_times.append(person.wait_time)
         return self._wait_times
 
