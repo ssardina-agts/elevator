@@ -1,7 +1,11 @@
 import argparse
-import logging
 
+import logging
 import coloredlogs
+LOGGING_LEVEL = 'INFO'
+LOGGING_FMT = '%(asctime)s %(levelname)s %(message)s'
+coloredlogs.install(level=LOGGING_LEVEL, fmt=LOGGING_FMT)
+
 
 from controller.baseline_agents import Baseline, Efficient
 from model.simulator import Simulator
