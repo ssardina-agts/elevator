@@ -14,7 +14,7 @@ class Baseline(Agent):
     def next_actions(self, state: State) -> dict:
         directions = []
         targets = []
-        for car in state.status['cars']:
+        for car in state.cars:
             if car.current_floor != 0 and car.current_floor != state.num_floors - 1:
                 directions.append(car.direction)
                 if car.direction == 1:
@@ -46,7 +46,7 @@ class Efficient(Agent):
                 elevator_buttons[person.target_floor] = True
         floors_people_want_to_go_to = [i for i in range(len(elevator_buttons)) if
                                        elevator_buttons[i]]  # in elevator
-        for car in state.status['cars']:
+        for car in state.cars:
             if not car.full:
                 floors_people_want_to_go_to.extend([floor for floor in range(state.num_floors) if
                                                     bool(state.floor_population[floor])])  # on floors

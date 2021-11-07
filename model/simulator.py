@@ -26,31 +26,31 @@ class Simulator(object):
         print('INITIAL STATE:')
         self._state.print()
 
-        while self._state.status['arrived_people_number'] < self._state.num_people:
+        while self._state.num_arrived < self._state.num_people:
 
             # get the actions per car
             actions = self._agent.next_actions(self._state)
 
             idx_car = 0
-            for car in self._state.status['cars']:
+            for car in self._state.cars:
                 car.direction = actions['directions'][idx_car]
                 car.target_floor = actions['targets'][idx_car]
 
-                for person in self._state.status['people']:
+                for person in self._state.people:
                     if person.in_car:
                         if car.current_floor == person.target_floor:
                             person.in_car = False
                             person.arrived = True
                             car.in_people -= 1
                             self._state.floor_population[car.current_floor] -= 1
-                            self._state.status['arrived_people_number'] += 1
+                            self._state.num_arrived += 1
                             self._display.arriving_person(person, car)
 
                         else:
                             person.current_floor += car.direction
                             person.wait_time += 1
 
-                for person in self._state.status['people']:
+                for person in self._state.people:
                     # This measures the wait time of each person by one unit everytime the lift moves
                     # It includes time spent in the lift. It only stops counting when they have arrived
                     if not person.arrived and not person.in_car:

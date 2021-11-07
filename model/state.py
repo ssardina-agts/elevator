@@ -28,10 +28,10 @@ class State(object):
 
         self._arrived_people_number = 0
 
-    @property
-    def status(self):
-        # return self._status
-        return {"people": self._people, "cars": self._cars, "floors_number": self._floors_number, 'arrived_people_number': self._arrived_people_number}
+    # @property
+    # def status(self):
+    #     # return self._status
+    #     return {"people": self._people, "cars": self._cars, "floors_number": self._floors_number, 'arrived_people_number': self._arrived_people_number}
 
     @property
     def people(self):
@@ -45,11 +45,15 @@ class State(object):
     def num_arrived(self):
         return self._arrived_people_number
 
+    @num_arrived.setter
+    def num_arrived(self, value):
+        self._arrived_people_number = value
+
 
     @property
     def wait_times(self):
         self._wait_times = []
-        for person in self._status['people']:
+        for person in self.people:
             if not person.arrived:
                 print('Somethings gone wrong')
             self._wait_times.append(person.wait_time)
