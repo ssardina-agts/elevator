@@ -23,9 +23,7 @@ class State(object):
 
         self._cars = []
         for idx in range(len(cars_info)):
-            self._cars.append(Car(id=idx, capacity=cars_info[idx]))
-
-        # self._status = {"people": people, "cars": cars, "floors_number": self._floors_number, 'arrived_people_number': 0}
+            self._cars.append(Car(id=idx, max_floor=floors_number-1, capacity=cars_info[idx]))
 
         self._arrived_people_number = 0
 
@@ -78,10 +76,10 @@ class State(object):
     def __str__(self):
         people_str = ""
         for person in self._people:
-            people_str += str(person) + "\n"
+            people_str += "\t" + str(person) + "\n"
 
         cars_str = ""
         for car in self._cars:
-            cars_str += str(car) + "\n"
+            cars_str += "\t" + str(car) + "\n"
 
         return people_str + "\n" + cars_str
