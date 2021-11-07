@@ -3,16 +3,18 @@ import random
 
 class Person(object):
     """
-    This is an object used to model each person in the simulation. Each person has various attibutes
+    This is an object used to model each person in the simulation. Each person has various attributes
     """
     population = 0  # This keeps track of how many people have been generated
 
-    def __init__(self, floors_number):
+    def __init__(self, id, floors_number):
         self.animation = None  # this stores the canvas object for each person
         # self.id = Person.population
         # Person.population += 1
-        self.elevator_spot = False
 
+        self.id = id
+
+        self.elevator_spot = False
         self.current_floor = random.randint(0, floors_number - 1)
         self.target_floor = random.randint(0, floors_number - 1)
         while self.current_floor == self.target_floor:
@@ -23,11 +25,8 @@ class Person(object):
         self.in_car = False
         self.wait_time = 0
 
-    def print(self):
-        print('current floor: ',self.current_floor)
-        print('target floor: ', self.target_floor)
-        print('person in car: ', self.in_car)
-        print('arrived: ', self.arrived)
+    def __str__(self):
+        return f"Pearson {self.id}: [{self.current_floor}, {self.target_floor}, {self.in_car}, {self.arrived}]"
 
     # def arrived(self, floor):
     #     """Returns true if the person has arrived at where they wanted to go"""

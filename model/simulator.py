@@ -4,6 +4,7 @@ from view.display import Display
 import copy
 
 
+import logging
 class Simulator(object):
 
     def __init__(self, people_number=2, floors_number=2, cars=[1]):
@@ -23,18 +24,18 @@ class Simulator(object):
         assert self._agent is not None
         self._display = Display(self._state, animation_speed, self._agent.name)
 
-        print('INITIAL STATE:')
-        self._state.print()
+        logging.info(f'INITIAL STATE:\n {str(self._state)}')
 
+        sim_step = 0
         while self._state.num_arrived < self._state.num_people:
+            sim_step += 1
 
-            # get the actions per car
+            # get the actions per car: dictionary car.id --> (direction, target)
             actions = self._agent.next_actions(self._state)
+            logging.info(f"Actions returned by controller for step {sim_step}: {actions}")
 
-            idx_car = 0
             for car in self._state.cars:
-                car.direction = actions['directions'][idx_car]
-                car.target_floor = actions['targets'][idx_car]
+                car.go(actions[car.id][0], actions[car.id][1])
 
                 for person in self._state.people:
                     if person.in_car:
@@ -61,9 +62,13 @@ class Simulator(object):
                             self._display.in_car(person, car)
                         person.wait_time += 1
 
-                car.current_floor += actions['directions'][idx_car]
+                car.go(actions[car.id][0], actions[car.id][1])
+
+            # now time to display...
             self._display.iteraction()
-            self._state.print()
+            logging.info(f"Reporting state at simulation step {sim_step}: \n {str(self._state)}")
+
+        # end of simulation, show wait times and finish...
         print(self._state.wait_times)
 
         self._display.finish()

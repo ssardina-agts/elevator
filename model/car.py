@@ -60,7 +60,13 @@ class Car(object):
             self._full = False
         return self._full
 
-    def print(self):
-        print('current floor: ', self._current_floor)
-        print('direction_value: ', self._direction)
-        print('people number in car: ', self._in_people)
+    def go(self, direction, target):
+        self._direction = direction
+        self._target_floor = target
+
+    def stop(self):
+        self._direction = 0
+        self._target_floor = -1
+
+    def __str__(self):
+        return f"Car {self._id}: [{self._current_floor}, {self._direction}, {self._in_people}]"
