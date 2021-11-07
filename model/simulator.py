@@ -69,6 +69,6 @@ class Simulator(object):
             logging.info(f"Reporting state at simulation step {sim_step}: \n {str(self._state)}")
 
         # end of simulation, show wait times and finish...
-        print(self._state.wait_times)
+        logging.info(f"Waiting times: {self._state.wait_times}")
 
         self._display.finish()
