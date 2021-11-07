@@ -15,15 +15,15 @@ class Baseline(Agent):
         directions = []
         targets = []
         for car in state.status['cars']:
-            if car.current_floor != 0 and car.current_floor != state.floors_number - 1:
+            if car.current_floor != 0 and car.current_floor != state.num_floors - 1:
                 directions.append(car.direction)
                 if car.direction == 1:
-                    targets.append(state.floors_number- 1)
+                    targets.append(state.num_floors- 1)
                 else:
                     targets.append(0)
             elif car.current_floor == 0:
                 directions.append(1)
-                targets.append(state.floors_number - 1)
+                targets.append(state.num_floors - 1)
             else:
                 directions.append(-1)
                 targets.append(0)
@@ -39,7 +39,7 @@ class Efficient(Agent):
         directions = []
         targets = []
 
-        elevator_buttons = [False] * state.floors_number  # reset elevator buttons
+        elevator_buttons = [False] * state.num_floors  # reset elevator buttons
 
         for person in state.status['people']:
             if person.in_car:
@@ -48,7 +48,7 @@ class Efficient(Agent):
                                        elevator_buttons[i]]  # in elevator
         for car in state.status['cars']:
             if not car.full:
-                floors_people_want_to_go_to.extend([floor for floor in range(state.floors_number) if
+                floors_people_want_to_go_to.extend([floor for floor in range(state.num_floors) if
                                                     bool(state.floor_population[floor])])  # on floors
             highest_floor = max(floors_people_want_to_go_to)
             lowest_floor = min(floors_people_want_to_go_to)
