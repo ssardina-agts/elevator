@@ -7,7 +7,7 @@ from controller.baseline_agents import Baseline, Efficient
 from model.simulator import Simulator
 
 def main(args):
-    simulator = Simulator(people_number=args.num_people, floors_number=args.num_floors, cars=[3])
+    simulator = Simulator(people_number=args.num_people, floors_number=args.num_floors, cars=[3,2])
     agent = Baseline()
     # agent = Efficient()
 
