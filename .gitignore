@@ -284,3 +284,4 @@ TSWLatexianTemp*
 main.pdf
 main_JBHI.pdf
 *.loc
+.vscode
