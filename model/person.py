@@ -21,8 +21,11 @@ class Person(object):
             self.target_floor = random.randint(0, floors_number - 1)
         self.direction = (1 if self.current_floor < self.target_floor else -1)
         # self.distance = floorheight * (self.start_floor - self.target_floor)
-        self.arrived = False
         self.in_car = False
+
+        self.arrived = False
+        self.boarding_step = -1
+        self.arrived_step = -1
         self.wait_time = 0
 
     def __str__(self):

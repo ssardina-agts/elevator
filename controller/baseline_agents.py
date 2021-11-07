@@ -13,14 +13,12 @@ class Baseline(Agent):
 
     def next_actions(self, state: State) -> dict:
         actions = {}
-        targets = []
-        for car in state.cars:
-            if car.current_floor != 0 and car.current_floor != state.num_floors - 1:
-                actions[car.id] = (car.direction, car.target_floor)
-            elif car.current_floor == 0:
-                actions[car.id] = (1, state.num_floors- 1)
-            else:
-                actions[car.id] = (-1, 0)
+        if car.current_floor != 0 and car.current_floor != state.num_floors - 1:
+            actions[car.id] = (car.direction, car.target_floor)
+        elif car.current_floor == 0:
+            actions[car.id] = (1, state.num_floors- 1)
+        else:
+            actions[car.id] = (-1, 0)
         return actions
 
 
