@@ -8,13 +8,13 @@ class State(object):
     """
 
     def __init__(self, people_number, floors_number, cars_info):
-        self._people_number=people_number
+        self._people_number = people_number
         self._floors_number = floors_number
         self._floor_population = [0] * (self.num_floors)
 
         self._people = []
         for idx in range(self._people_number):
-            person = Person(floors_number=self._floors_number)
+            person = Person(idx, floors_number=self._floors_number)
             # s_f = person.start_floor  # s_f is shorthand for start_floor to clean the code
 
             # floor_population[s_f] += 1
@@ -49,7 +49,6 @@ class State(object):
     def num_arrived(self, value):
         self._arrived_people_number = value
 
-
     @property
     def wait_times(self):
         self._wait_times = []
@@ -75,17 +74,13 @@ class State(object):
     def floor_population(self, value):
         self._floor_population = value
 
-
-
-    def print(self):
-        print('\nstatus')
-        idx=0
+    def __str__(self):
+        people_str = ""
         for person in self._people:
-            print('\nperson '+str(idx))
-            person.print()
-            idx+=1
-        idx = 0
+            people_str += str(person) + "\n"
+
+        cars_str = ""
         for car in self._cars:
-            print('\ncar ' + str(idx))
-            car.print()
-            idx += 1
+            cars_str += str(car) + "\n"
+
+        return people_str + "\n" + cars_str
