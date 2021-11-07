@@ -6,12 +6,9 @@ import copy
 
 class Simulator(object):
 
-    def __init__(self, people_number=2, floors_number=2, info_cars=None):
-        if info_cars is None:
-            info_cars = {"car_number": 1, "capacity": [1]}
-
+    def __init__(self, people_number=2, floors_number=2, cars=[1]):
         self._all_done = False
-        self._state = State(people_number, floors_number, info_cars)
+        self._state = State(people_number, floors_number, cars)
 
         self._agent = None
 
@@ -29,7 +26,7 @@ class Simulator(object):
         print('INITIAL STATE:')
         self._state.print()
 
-        while self._state.status['arrived_people_number'] < self._state.people_number:
+        while self._state.status['arrived_people_number'] < self._state.num_people:
 
             # get the actions per car
             actions = self._agent.next_actions(self._state)
@@ -52,9 +49,6 @@ class Simulator(object):
                         else:
                             person.current_floor += car.direction
                             person.wait_time += 1
-
-
-
 
                 for person in self._state.status['people']:
                     # This measures the wait time of each person by one unit everytime the lift moves

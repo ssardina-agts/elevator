@@ -3,13 +3,18 @@ class Car(object):
     A class to store the floor position (floor) and the max capacity of a elevator
     """
 
-    def __init__(self, target_floor_value=0,current_floor_value=0, capacity_value=1, direction_value=0):
-        self._current_floor = current_floor_value
-        self._target_floor=target_floor_value
-        self._capacity = capacity_value
-        self._direction = direction_value
+    def __init__(self, id, target_floor=0, current_floor=0, capacity=1, direction=0):
+        self._id = id
+        self._current_floor = current_floor
+        self._target_floor = target_floor
+        self._capacity = capacity
+        self._direction = direction
         self._in_people = 0
         self._full = False
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def current_floor(self):
@@ -30,8 +35,6 @@ class Car(object):
     @property
     def capacity(self):
         return self._capacity
-
-
 
     @property
     def direction(self):
@@ -56,7 +59,6 @@ class Car(object):
         if self._in_people < self._capacity:
             self._full = False
         return self._full
-
 
     def print(self):
         print('current floor: ', self._current_floor)

@@ -7,27 +7,43 @@ class State(object):
     A simple class to store the state of the system
     """
 
-    def __init__(self, people_number, floors_number, info_cars):
-        people = []
-        cars = []
+    def __init__(self, people_number, floors_number, cars_info):
         self._people_number=people_number
         self._floors_number = floors_number
-        self._floor_population = [0] * (self.floors_number)
+        self._floor_population = [0] * (self.num_floors)
+
+        self._people = []
         for idx in range(self._people_number):
             person = Person(floors_number=self._floors_number)
             # s_f = person.start_floor  # s_f is shorthand for start_floor to clean the code
 
             # floor_population[s_f] += 1
-            people.append(person)
-        for idx in range(info_cars['car_number']):
-            car = Car(capacity_value=info_cars['capacity'][idx])
-            cars.append(car)
+            self._people.append(person)
 
-        self._status = {"people": people, "cars": cars, "floors_number": self._floors_number, 'arrived_people_number': 0}
+        self._cars = []
+        for idx in range(len(cars_info)):
+            self._cars.append(Car(id=idx, capacity=cars_info[idx]))
+
+        # self._status = {"people": people, "cars": cars, "floors_number": self._floors_number, 'arrived_people_number': 0}
+
+        self._arrived_people_number = 0
 
     @property
     def status(self):
-        return self._status
+        # return self._status
+        return {"people": self._people, "cars": self._cars, "floors_number": self._floors_number, 'arrived_people_number': self._arrived_people_number}
+
+    @property
+    def people(self):
+        return self._people
+
+    @property
+    def cars(self):
+        return self._cars
+
+    @property
+    def num_arrived(self):
+        return self._arrived_people_number
 
 
     @property
@@ -40,11 +56,11 @@ class State(object):
         return self._wait_times
 
     @property
-    def people_number(self):
+    def num_people(self):
         return self._people_number
 
     @property
-    def floors_number(self):
+    def num_floors(self):
         return self._floors_number
 
     @property
@@ -60,12 +76,12 @@ class State(object):
     def print(self):
         print('\nstatus')
         idx=0
-        for person in self._status['people']:
+        for person in self._people:
             print('\nperson '+str(idx))
             person.print()
             idx+=1
         idx = 0
-        for car in self._status['cars']:
+        for car in self._cars:
             print('\ncar ' + str(idx))
             car.print()
             idx += 1

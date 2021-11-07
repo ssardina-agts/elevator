@@ -9,11 +9,11 @@ class Display(object):
         self._state = state
         self._name_agent=name_agent
 
-        self._floor_height = round(
-            600 / self._state.floors_number)  # This is for animating people. Total size is 600px
-        self._arrivals_population = [0] * (self._state.floors_number)  # This is for  animating purposes only
-        self._elevator_animation = [0] * self._state.status['cars'][
-            0].capacity  # This is for people inside the elevator
+        self._floor_height = round(600 / self._state.num_floors)  # To animate people. Total size is 600px
+        self._arrivals_population = [0] * (self._state.num_floors)
+        print(self._state.cars)
+        self._elevator_animation = [0] * self._state.cars[0].capacity  # For people inside the elevator
+
         tk = Tk()
         tk.attributes("-fullscreen", True)
         canvas = Canvas(tk, width=2000, height=1000)
@@ -28,14 +28,14 @@ class Display(object):
         self._inside_label = canvas.create_text(100, 95, text='Inside elevator', anchor='w')
         self._delivered_label = canvas.create_text(100, 115, text='Arrived', anchor='w')
         # This next part sets up the drawing of the floors and labeling them
-        for k in range(self._state.floors_number):
-            canvas.create_line(50, 200 + (self._state.floors_number - k) * self._floor_height, 600,
-                               200 + (self._state.floors_number - k) * self._floor_height)
-            canvas.create_text(5, 200 + (self._state.floors_number - k) * self._floor_height,
+        for k in range(self._state.num_floors):
+            canvas.create_line(50, 200 + (self._state.num_floors - k) * self._floor_height, 600,
+                               200 + (self._state.num_floors - k) * self._floor_height)
+            canvas.create_text(5, 200 + (self._state.num_floors - k) * self._floor_height,
                                text='Floor ' + str(k), anchor='w')
-        canvas.create_rectangle(200, 200, 400, 200 + self._floor_height * self._state.floors_number)  # shaft
-        self._elevator = canvas.create_rectangle(203, 200 + self._floor_height * (self._state.floors_number - 1),
-                                           397, 200 + self._floor_height * self._state.floors_number,
+        canvas.create_rectangle(200, 200, 400, 200 + self._floor_height * self._state.num_floors)  # shaft
+        self._elevator = canvas.create_rectangle(203, 200 + self._floor_height * (self._state.num_floors - 1),
+                                           397, 200 + self._floor_height * self._state.num_floors,
                                            fill='black')
         tk.update()
 
@@ -44,10 +44,10 @@ class Display(object):
             person.animation = canvas.create_oval(
                 185 - offset,
                 # x start
-                190 + (self._state.floors_number - person.current_floor) * self._floor_height,
+                190 + (self._state.num_floors - person.current_floor) * self._floor_height,
                 # y
                 195 - offset,  # x finish
-                200 + (self._state.floors_number - person.current_floor) * self._floor_height,
+                200 + (self._state.num_floors - person.current_floor) * self._floor_height,
                 # y
                 fill='black')
             tk.update()
@@ -70,13 +70,9 @@ class Display(object):
         self._arrivals_population[car.current_floor] += 1
         self.move_slowly(person.animation, 390 + self._arrivals_population[car.current_floor] * 12 -
                          self._canvas.coords(person.animation)[0], 15 * (person.elevator_spot % 2))
-        self._canvas.itemconfig(self._delivered_label,
-                                text='Arrived - ' + str(self._state.status['arrived_people_number']))
-        self._canvas.itemconfig(self._inside_label,
-                                text='Inside elevator - ' + str(car.in_people))
-        self._canvas.itemconfig(self._waiting_label,
-                                text='Waiting - ' + str(
-                                    self._state.people_number - self._state.status['arrived_people_number']))
+        self._canvas.itemconfig(self._delivered_label, text=f'Arrived - {self._state.num_arrived}')
+        self._canvas.itemconfig(self._inside_label, text=f'Inside elevator - {car.in_people}')
+        self._canvas.itemconfig(self._waiting_label, text=f'Waiting - {self._state.num_people - self._state.num_arrived}')
 
     def in_car(self, person, car):
         for spot in range(len(self._elevator_animation)):
@@ -90,8 +86,7 @@ class Display(object):
         self._canvas.itemconfig(self._inside_label,
                           text='Inside elevator - ' + str(car.in_people))
         self._canvas.itemconfig(self._waiting_label,
-                          text='Waiting - ' + str(
-                                    self._state.people_number - self._state.status['arrived_people_number']))
+                          text=f'Waiting - {self._state.num_people - self._state.num_arrived}')
 
     def iteraction(self):
         for i in range(self._floor_height):
@@ -112,6 +107,6 @@ class Display(object):
         print('\n\nLongest wait', longest_wait_time)
         print('Shortest wait', min(self._state.wait_times))
         print('Sum of all wait times', sum(self._state.wait_times))
-        print(self._state.floors_number, 'floor building with', self._state.people_number, 'people')
+        print(self._state.num_floors, 'floor building with', self._state.people_number, 'people')
         print('Average wait time of', average_wait_time, 'when using', self._name_agent, '\n\n')
         self._tk.mainloop()
