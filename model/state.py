@@ -9,6 +9,8 @@ class State(object):
     """
 
     def __init__(self, people_number, floors_number, cars_info):
+        self.sim_step = 0
+
         self._people_number = people_number
         self._floors_number = floors_number
         self._floor_population = [0] * (self.num_floors)
