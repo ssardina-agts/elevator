@@ -29,7 +29,7 @@ class Person(object):
         self.wait_time = 0
 
     def __str__(self):
-        return f"Pearson {self.id}: [{self.current_floor}, {self.target_floor}, {self.in_car}, {self.arrived}]"
+        return f"Pearson {self.id}: [floor({self.current_floor}), target({self.target_floor}), inCar({self.in_car}), arrived({self.arrived})]"
 
     # def arrived(self, floor):
     #     """Returns true if the person has arrived at where they wanted to go"""
