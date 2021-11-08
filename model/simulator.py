@@ -28,13 +28,12 @@ class Simulator(object):
 
         logging.info(f'INITIAL STATE:\n {str(self._state)}')
 
-        sim_step = 0
         while self._state.num_arrived < self._state.num_people:
-            sim_step += 1
+            self._state.sim_step += 1
 
             # get the actions per car: dictionary car.id --> (direction, target)
             actions = self._agent.next_actions(self._state)
-            logging.info(f"Actions returned by controller for step {sim_step}: {actions}")
+            logging.info(f"Actions returned by controller for step {self._state.sim_step}: {actions}")
 
 
             for car in self._state.cars:
@@ -48,7 +47,7 @@ class Simulator(object):
                         if car.current_floor == person.target_floor:
                             person.in_car = False
                             person.arrived = True
-                            person.arrived_step = sim_step
+                            person.arrived_step = self._state.sim_step
                             person.current_floor += car.current_floor
 
                             car.in_people -= 1
@@ -66,14 +65,14 @@ class Simulator(object):
                             # process people waiting that can board the car
                             person.in_car = True
                             person.current_floor = -1   # signal person is inside car
-                            person.boarding_step = sim_step
+                            person.boarding_step = self._state.sim_step
 
                             car.in_people += 1
                             self._display.in_car(person, car)
 
             # now time to display...
             self._display.iteraction()
-            logging.info(f"Reporting state at simulation step {sim_step}:\n{str(self._state)}")
+            logging.info(f"Reporting state at simulation step {self._state.sim_step}:\n{str(self._state)}")
 
         # end of simulation, show wait times and finish...
         logging.info(f"Waiting times: {self._state.wait_times}")
