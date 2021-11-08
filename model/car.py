@@ -11,6 +11,8 @@ class Car(object):
         self._capacity = capacity
         self._direction = direction
         self._in_people = 0
+        self._door_open = False
+        self._floors_buttons = []
         self._full = False
 
     @property
@@ -20,6 +22,10 @@ class Car(object):
     @property
     def current_floor(self):
         return self._current_floor
+
+    @property
+    def door_open(self):
+        return self._door_open
 
     @current_floor.setter
     def current_floor(self, value):
@@ -70,5 +76,17 @@ class Car(object):
         self._direction = 0
         self._target_floor = -1
 
+
+    @property
+    def floors_buttons(self):
+        return self._floors_buttons
+
+    def push_floor_button(self, n):
+        self._floors_buttons.append(n)
+
+    def flush_floors_buttons(self):
+        self._floors_buttons = []
+
+
     def __str__(self):
-        return f"Car {self._id}: [{self._current_floor}, {self._direction}, {self._in_people}]"
+        return f"Car {self._id}: [floor({self._current_floor}), door({self.door_open}), dir({self._direction}), people({self._in_people}), buttons({self.floors_buttons})]"
