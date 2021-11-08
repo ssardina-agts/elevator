@@ -1,7 +1,7 @@
 import time
 from tkinter import Tk, Canvas
 
-from PersonFile import Person
+from old_code.PersonFile import Person
 
 
 def single_simulation(algorithm, number_of_people, number_of_floors, max_elevator_capacity=6,

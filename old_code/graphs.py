@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import colors
 from matplotlib import pyplot as plt
 
-from mechanical_control_model import single_simulation
+from old_code.mechanical_control_model import single_simulation
 
 
 

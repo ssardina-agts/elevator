@@ -1,5 +1,5 @@
 
-from graphs import *
+from old_code.graphs import *
 
 if __name__ == "__main__":
     print("Simulation started at {}".format(datetime.now().strftime("%H:%M:%S")))
