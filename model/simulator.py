@@ -1,80 +1,139 @@
 from model.state import State
 from controller.agent import Agent
-from view.display import Display
-import copy
-
+from view.screen import Screen
 
 import logging
+import simpy
+from model.car import Car
+from model.person import Person
 
 
 class Simulator(object):
 
-    def __init__(self, people_number=2, floors_number=2, cars=[1]):
-        self._all_done = False
-        self._state = State(people_number, floors_number, cars)
+    def __init__(self, num_people, num_cars, cars_capacity, num_floors, anim_speed_factor):
 
+        # initialization simpy
+        self._env = simpy.RealtimeEnvironment(initial_time=0, factor=anim_speed_factor, strict=False)
+
+        cars = []
+        for idx in range(num_cars):
+            cars.append(Car(id=idx, env=self._env, num_floors=num_floors, capacity=cars_capacity[idx]))
+        people = []
+        for idx in range(num_people):
+            people.append(Person(id=idx, env=self._env, num_floors=num_floors))
+
+        self._state = State(cars=cars, people=people, num_floors=num_floors, num_people=num_people, num_cars=num_cars)
         self._agent = None
 
+        # initialization pygame
+        self._screen = Screen(self._state)
+
+        self._waiting_time = 10
+
     def register_agent(self, agent: Agent):
+        # transfer the state to the agent
+        agent.state = self._state
         self._agent = agent
 
-    def run(self, animation_speed=0.1):
+    def run(self):
         """
         Run the simulator!
         :return:
         """
-        assert self._agent is not None
-        self._display = Display(self._state, animation_speed, self._agent.name)
+        logging.info(f'INITIAL STATE:' + str(self._state))
 
-        logging.info(f'INITIAL STATE:\n {str(self._state)}')
+        # Initialization updating of screen
+        self._env.process(self.screen_update())
 
-        while self._state.num_arrived < self._state.num_people:
-            self._state.sim_step += 1
+        # Initialization updating of directions of the cars
+        self._env.process(self.run_update_directions())
 
-            # get the actions per car: dictionary car.id --> (direction, target)
-            actions = self._agent.next_actions(self._state)
-            logging.info(f"Actions returned by controller for step {self._state.sim_step}: {actions}")
+        # Initialization people arriving process and check if all of them arrived
+        self._env.process(self.run_arrivig_people())
 
+        # Initialization people getting in process
+        self._env.process(self.run_getting_in_people())
 
-            for car in self._state.cars:
-                car.go(actions[car.id][0], actions[car.id][1])
+        # Initialization movement of the cars
+        self._env.process(self.run_movement_cars())
 
+        logging.info(f'SIMULATION START')
+        self._env.run()
+
+        logging.info(f'FINAL STATE:' + str(self._state))
+
+    def run_getting_in_people(self):
+        while not self._state.all_people_arrive:
+            if self._env.now > 0:
                 for person in self._state.people:
-                    # process people inside the car
-                    #TODO: this must be wrong, which car?
-                    if person.in_car:
-                        # person has arrived to destination
-                        if car.current_floor == person.target_floor:
-                            person.in_car = False
-                            person.arrived = True
-                            person.arrived_step = self._state.sim_step
-                            person.current_floor += car.current_floor
+                    person.getting_in(self._state.cars)
+                    if self._state.num_people == person.id + 1:
+                        yield self._env.timeout(self._state.num_cars + 2)
+                    else:
+                        yield self._env.timeout(1)
+            else:
+                yield self._env.timeout(1)
 
-                            car.in_people -= 1
+    def run_arrivig_people(self):
+        while not self._state.all_people_arrive:
+            if self._env.now > 0:
+                num_arrives = 0
+                for person in self._state.people:
+                    person.arriving(self._state.cars)
+                    if person.arrived:
+                        num_arrives += 1
+                    if num_arrives == self._state.num_people:
+                        self._state.all_people_arrive = True
+                    if self._state.num_people == person.id + 1:
+                        yield self._env.timeout(self._state.num_cars + 2)
+                    else:
+                        yield self._env.timeout(1)
+            else:
+                yield self._env.timeout(1)
 
-                            self._state.floor_population[car.current_floor] -= 1
-                            self._state.num_arrived += 1
-                            self._display.arriving_person(person, car)
-                        else:
-                            # This measures the wait time of each person by one unit everytime the lift moves
-                            # It includes time spent in the lift. It only stops counting when they have arrived
-                            person.wait_time += 1
-                    elif not person.arrived:    # process people outside cars waiting in floors
-                        person.wait_time += 1
-                        if car.current_floor == person.current_floor and not car.full and car.direction == person.direction:
-                            # process people waiting that can board the car
-                            person.in_car = True
-                            person.current_floor = -1   # signal person is inside car
-                            person.boarding_step = self._state.sim_step
+    def screen_update(self):
+        while not (self._state.all_people_arrive and self._waiting_time == 0):
+            self._screen.update()
+            if self._state.all_people_arrive:
+                self._waiting_time -= 1
+            yield self._env.timeout(1)
 
-                            car.in_people += 1
-                            self._display.in_car(person, car)
+    ########################################################################## TO DO: change for an execute  actions (implement door open and close)
+    def run_update_directions(self):
+        while not self._state.all_people_arrive:
+            # get actions from agent
+            actions = self._agent.next_actions()
 
-            # now time to display...
-            self._display.iteraction()
-            logging.info(f"Reporting state at simulation step {self._state.sim_step}:\n{str(self._state)}")
+            # check if the all cars have actions from the controller
+            if len(actions) != self._state.num_cars:
+                logging.error(
+                    f"Number of action {len(actions)} is not equal to number of cars{len(self._state.cars)} at simulation step {self._env.now}")
 
-        # end of simulation, show wait times and finish...
-        logging.info(f"Waiting times: {self._state.wait_times}")
+            # update directions of the cars using actions from agent
+            for id_car in range(self._state.num_cars):
+                car = self._state.cars[id_car]
+                car.direction = actions[id_car]
+                logging.info(f"Car {car.id} direction {car.direction} at simulation step {self._env.now}")
+            yield self._env.timeout(self._state.num_people + self._state.num_cars + 1)
 
-        self._display.finish()
+    def run_movement_cars(self):
+        while not self._state.all_people_arrive:
+            if self._env.now > self._state.num_people:
+                # momevent of the cars according to the directions
+                for car in self._state.cars:
+                    car.movement()
+                    # updating position of people who are in the cars
+                    self.update_people_in_cars()
+                    if self._state.num_cars == car.id + 1:
+                        yield self._env.timeout(self._state.num_people + 2)
+                    else:
+                        yield self._env.timeout(1)
+            else:
+                yield self._env.timeout(1)
+
+    def update_people_in_cars(self):
+        for person in self._state.people:
+            if person.in_car:
+                person.current_floor = self._state.cars[person.id_car].current_floor
+                logging.info(
+                    f"Person {person.id} moves to {person.current_floor} in car {person.id_car} at simulation step {self._env.now}")

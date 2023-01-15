@@ -1,4 +1,5 @@
 import random
+import logging
 
 
 class Person(object):
@@ -7,37 +8,94 @@ class Person(object):
     """
     population = 0  # This keeps track of how many people have been generated
 
-    def __init__(self, id, floors_number):
-        self.animation = None  # this stores the canvas object for each person
-        # self.id = Person.population
-        # Person.population += 1
+    def __init__(self, id, num_floors, env):
 
-        self.id = id
+        self._id = id
 
-        self.elevator_spot = False
-        self.current_floor = random.randint(0, floors_number - 1)
-        self.target_floor = random.randint(0, floors_number - 1)
-        while self.current_floor == self.target_floor:
-            self.target_floor = random.randint(0, floors_number - 1)
-        self.direction = (1 if self.current_floor < self.target_floor else -1)
-        # self.distance = floorheight * (self.start_floor - self.target_floor)
-        self.in_car = False
+        # set randomly the current and target floors (excluding the case when both are equals)
+        self._current_floor = random.randint(0, num_floors - 1)
+        self._target_floor = random.randint(0, num_floors - 1)
+        while self._current_floor == self._target_floor: self._target_floor = random.randint(0, num_floors - 1)
+        self._direction = (1 if self._current_floor < self._target_floor else -1)
+        self._in_car = False
+        self._id_car = None
+        self._arrived = False
+        self._wait_time = 0
+        self._env = env
 
-        self.arrived = False
-        self.boarding_step = -1
-        self.arrived_step = -1
-        self.wait_time = 0
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def current_floor(self):
+        return self._current_floor
+
+    @current_floor.setter
+    def current_floor(self, value):
+        self._current_floor = value
+
+    @property
+    def target_floor(self):
+        return self._target_floor
+
+    @property
+    def direction(self):
+        return self._direction
+
+    @direction.setter
+    def direction(self, value):
+        self._direction = value
+
+    @property
+    def in_car(self):
+        return self._in_car
+
+    @in_car.setter
+    def in_car(self, value):
+        self._in_car = value
+
+    @property
+    def id_car(self):
+        return self._id_car
+
+    @id_car.setter
+    def id_car(self, value):
+        self._id_car = value
+
+    @property
+    def arrived(self):
+        return self._arrived
+
+    @property
+    def wait_time(self):
+        return self._wait_time
+
+    @property
+    def env(self):
+        return self._env
 
     def __str__(self):
-        return f"Pearson {self.id}: [floor({self.current_floor}), target({self.target_floor}), inCar({self.in_car}), arrived({self.arrived})]"
+        return f"Person {self._id}: [current floor: {self._current_floor}, target floor: {self._target_floor}" \
+               f", id car: {self._id_car}, arrived: {self._arrived}, total steps to get goal: {self._wait_time}]"
 
-    # def arrived(self, floor):
-    #     """Returns true if the person has arrived at where they wanted to go"""
-    #     return True if floor == self.target_floor else False
+    def arriving(self, cars):
+        # process when a person arrives
+        if self._in_car and self._current_floor == self._target_floor:
+            self._arrived = True
+            self._wait_time = self._env.now
+            cars[self._id_car].in_people -= 1
+            self._in_car = False
+            logging.info(
+                f"Person {self._id} arrives on floor {self._current_floor} at simulation step {self._env.now}")
 
-    # def waiting(self):
-    #     """
-    #     Returns True if the person is not in the elevator, and they have not got where they are going
-    #     :return: boolean of whether or not the person is waiting for the lift
-    #     """
-    #     return not self.in_car and not self.arrived
+    def getting_in(self, cars):
+        # locking for a available car
+        if not self._in_car and not self._arrived:
+            for car in cars:
+                if car.current_floor == self._current_floor and not car.full and self._direction == car.direction and not self._in_car:
+                    self._in_car = True
+                    self._id_car = car.id
+                    car.in_people += 1
+                    logging.info(
+                        f"Person {self._id} gets in car {self._id_car} in floor {self._current_floor} at simulation step {self._env.now}")
