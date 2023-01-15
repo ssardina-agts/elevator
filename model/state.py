@@ -3,14 +3,15 @@ class State(object):
     A simple class to store the state of the system
     """
 
-    def __init__(self, cars, people, num_floors, num_people,num_cars):
+    def __init__(self, cars, people, num_floors, num_people, num_cars, id_sim):
 
         self._cars = cars
         self._people = people
         self._num_floors = num_floors
         self._num_people = num_people
-        self._num_cars=num_cars
+        self._num_cars = num_cars
         self._all_people_arrive = False
+        self._id_sim = id_sim
 
     @property
     def cars(self):
@@ -49,6 +50,7 @@ class State(object):
         self._all_people_arrive = boolean
 
     def __str__(self):
+
         people_str = ""
         for person in self._people:
             people_str += "\t" + str(person) + "\n"
@@ -57,4 +59,4 @@ class State(object):
         for car in self._cars:
             cars_str += "\t" + str(car) + "\n"
 
-        return "\n" + people_str + "\n" + cars_str
+        return "\n Id simulation: " + str(self._id_sim) + "\n" + people_str + "\n" + cars_str
