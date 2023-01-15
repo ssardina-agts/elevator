@@ -1,14 +1,12 @@
-
-import asyncio
+import logging
 from abc import ABC, abstractmethod
-
-from model.state import State
 
 
 class Agent(ABC):
 
-    def __init__(self, name):
+    def __init__(self, name, state=None):
         self._name = name
+        self._state = state
 
     @property
     def name(self):
@@ -18,17 +16,8 @@ class Agent(ABC):
     def name(self, value):
         self._name = value
 
-    # @abstractmethod
-    # def initialised(self, state: State):
-    #     """
-    #     Called when the simulator is initialised.
-    #     :type state: Initial state of the system.
-    #     :return:
-    #     """
-    #     raise NotImplementedError()
-
     @abstractmethod
-    def next_actions(self, state: State) -> dict:
+    def next_actions(self) -> list:
         """
         Called when simulator is ready to take the next action
         :type state: An object of the system state.
@@ -36,7 +25,4 @@ class Agent(ABC):
         :return:
         """
         raise NotImplementedError()
-
-
-
 
