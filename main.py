@@ -1,20 +1,21 @@
 import argparse
 import coloredlogs
+import logging
 
 LOGGING_LEVEL = 'INFO'
 LOGGING_FMT = '%(asctime)s %(levelname)s %(message)s'
 coloredlogs.install(level=LOGGING_LEVEL, fmt=LOGGING_FMT)
-import logging
+
 
 from controller.baseline_agents import Baseline, Random
 from model.simulator import Simulator
 
 
 def main(args):
-    simulator = Simulator(args.num_people, args.num_cars, args.cars_capacity, args.num_floors, args.anim_speed_factor)
+    simulator = Simulator(args)
 
-    agent = Baseline()
-    # agent = Random()
+    # agent = Baseline()
+    agent = Random(probability=0.5)
     simulator.register_agent(agent)
     simulator.run()
 
@@ -33,37 +34,38 @@ if __name__ == "__main__":
         '--num_people',
         type=int,
         default=20,
-        help='Do not set the RSVP option %(default)s.',
+        help='Number of people, deault: %(default)s.',
     )
     parser.add_argument(
         '--num_floors',
         type=int,
         default=4,
-        help='Number of floor in building %(default)s.',
+        help='Number of floors, default: %(default)s.',
     )
     parser.add_argument(
         '--num_cars',
         type=int,
         default=3,
-        help='Number of cars in building %(default)s.',
+        help='Number of cars, default: %(default)s.',
     )
     parser.add_argument(
         '--cars_capacity',
         nargs='+',
         type=list,
         default=[5, 5, 5],
-        help='Capacity of each car in building %(default)s.',
+        help='Capacity of each car, default: %(default)s.',
     )
     parser.add_argument(
         '--anim_speed_factor',
         type=float,
         default=.1,
-        help='The factor defines how much real time passes with each step of simulation time. Ex: if you set default=2, each step will take 2 seconds, larger means slower simulation %(default)s.',
+        help='The factor defines how much real time passes with each step of simulation time. Ex: if you set anim_speed_factor=2, each step will take 2 seconds, larger means slower simulation. Default: %(default)s.',
     )
     parser.add_argument(
         '--gui',
         action="store_true",
-        help='Show the GUI display.',
+        default=True,
+        help='Show the GUI display, default: %(default)s.',
     )
     # we could also use vars(parser.parse_args()) to make args a dictionary args['<option>']
     args = parser.parse_args()

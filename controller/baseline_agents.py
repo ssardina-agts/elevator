@@ -1,8 +1,6 @@
-
 from controller.agent import Agent
 from random import random
 import logging
-
 
 
 class Baseline(Agent):
@@ -16,7 +14,7 @@ class Baseline(Agent):
         and vice-versa.
         Possible actions: 1(up), -1(down), and 0(stop)
         """
-        actions=[]
+        actions = []
         for car in self.state.cars:
             if car.current_floor == 0:
                 actions.append(1)
@@ -26,10 +24,12 @@ class Baseline(Agent):
                 actions.append(car.direction)
         return actions
 
+
 class Random(Agent):
 
-    def __init__(self):
-        super().__init__("Baseline")
+    def __init__(self, probability=0.5):
+        super().__init__("Random")
+        self._prob=probability
 
     def next_actions(self):
         """
@@ -37,9 +37,9 @@ class Random(Agent):
         and vice-versa.
         Possible actions: 1(up), -1(down), and 0(stop)
         """
-        actions=[]
+        actions = []
         for car in self.state.cars:
-            if random()>0.5:
+            if random() > self._prob:
                 if car.current_floor == self.state.num_floors - 1:
                     actions.append(0)
                 else:
@@ -50,6 +50,3 @@ class Random(Agent):
                 else:
                     actions.append(-1)
         return actions
-
-
-

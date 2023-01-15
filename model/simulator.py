@@ -10,25 +10,27 @@ from model.person import Person
 
 class Simulator(object):
 
-    def __init__(self, num_people, num_cars, cars_capacity, num_floors, anim_speed_factor):
+    def __init__(self, args):
 
         # initialization simpy
-        self._env = simpy.RealtimeEnvironment(initial_time=0, factor=anim_speed_factor, strict=False)
+        self._env = simpy.RealtimeEnvironment(initial_time=0, factor=args.anim_speed_factor, strict=False)
 
         cars = []
-        for idx in range(num_cars):
-            cars.append(Car(id=idx, env=self._env, num_floors=num_floors, capacity=cars_capacity[idx]))
+        for idx in range(args.num_cars):
+            cars.append(Car(id=idx, env=self._env, num_floors=args.num_floors, capacity=args.cars_capacity[idx]))
         people = []
-        for idx in range(num_people):
-            people.append(Person(id=idx, env=self._env, num_floors=num_floors))
+        for idx in range(args.num_people):
+            people.append(Person(id=idx, env=self._env, num_floors=args.num_floors))
 
-        self._state = State(cars=cars, people=people, num_floors=num_floors, num_people=num_people, num_cars=num_cars)
+        self._state = State(cars=cars, people=people, num_floors=args.num_floors, num_people=args.num_people, num_cars=args.num_cars,id_sim=args.id)
         self._agent = None
 
         # initialization pygame
-        self._screen = Screen(self._state)
+        self._gui=args.gui
+        if self._gui==True:
+            self._screen = Screen(self._state)
 
-        self._waiting_time = 10
+        self._waiting_time = 10 # waiting steps after finish simulation
 
     def register_agent(self, agent: Agent):
         # transfer the state to the agent
@@ -43,7 +45,8 @@ class Simulator(object):
         logging.info(f'INITIAL STATE:' + str(self._state))
 
         # Initialization updating of screen
-        self._env.process(self.screen_update())
+        if self._gui == True:
+            self._env.process(self.screen_update())
 
         # Initialization updating of directions of the cars
         self._env.process(self.run_update_directions())
