@@ -22,6 +22,10 @@ This simulation start from step 0 and each change in the simulation is shown usi
 
 ![Initial](images/initial_state.png)
 
+Finally, you can see the final state, which includes a simulation summary. 
+
+![Final](images/final_state.png)
+
 ## GUI
 
 The below figure shows a GUI example of this elevator simulator of a building with 4 floors. There are 3 cars (black rectangles), 5 people in the cars (blue points), 10 people who arrived to the target floor (green points), and 5 people waiting for a car (red points).
