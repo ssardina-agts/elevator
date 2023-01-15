@@ -5,6 +5,7 @@
 ## Google docs
 *.gdoc
 
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
