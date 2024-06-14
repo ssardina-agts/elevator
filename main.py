@@ -2,8 +2,8 @@ import argparse
 import coloredlogs
 import logging
 
-LOGGING_LEVEL = 'INFO'
-LOGGING_FMT = '%(asctime)s %(levelname)s %(message)s'
+LOGGING_LEVEL = "INFO"
+LOGGING_FMT = "%(asctime)s %(levelname)s %(message)s"
 coloredlogs.install(level=LOGGING_LEVEL, fmt=LOGGING_FMT)
 
 
@@ -12,7 +12,15 @@ from model.simulator import Simulator
 
 
 def main(args):
-    simulator = Simulator(args)
+    simulator = Simulator(
+        no_people=args.people,
+        no_floors=args.floors,
+        no_cars=args.cars,
+        capacity=args.capacity,
+        speed=args.speed,
+        gui=args.gui,
+        id=0,
+    )
 
     # agent = Baseline()
     agent = Random(probability=0.5)
@@ -23,57 +31,61 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="""
-        An elevator simulator in Python based on https://github.com/mrbrianevans/elevator
+        An multi-elevator simulator in Python
         """
     )
+    parser.add_argument("--id", help="Id if the simulation (if any).")
     parser.add_argument(
-        '--id',
-        help='Id if the simulation (if any).'
-    )
-    parser.add_argument(
-        '--num_people',
+        "--people",
+        "-p",
         type=int,
         default=20,
-        help='Number of people, deault: %(default)s.',
+        help="Total number of people to be served (Default: %(default)s)",
     )
     parser.add_argument(
-        '--num_floors',
+        "--floors",
+        "-f",
         type=int,
         default=4,
-        help='Number of floors, default: %(default)s.',
+        help="Number of floors (Default: %(default)s)",
     )
     parser.add_argument(
-        '--num_cars',
+        "--cars",
+        "-c",
         type=int,
         default=3,
-        help='Number of cars, default: %(default)s.',
+        help="Number of cars (Default: %(default)s)",
     )
     parser.add_argument(
-        '--cars_capacity',
-        nargs='+',
-        type=list,
+        "--capacity",
+        "-cc",
+        nargs="+",
+        # type=list,
         default=[5, 5, 5],
-        help='Capacity of each car, default: %(default)s.',
+        help="Capacity of each car (Default: %(default)s)",
     )
     parser.add_argument(
-        '--anim_speed_factor',
+        "--speed",
+        "-s",
         type=float,
-        default=.1,
-        help='The factor defines how much real time passes with each step of simulation time. Ex: if you set anim_speed_factor=2, each step will take 2 seconds, larger means slower simulation. Default: %(default)s.',
+        default=0.1,
+        help="The factor defines how much real time passes with each step of simulation time. Ex: if you set speed=2, each step will take 2 seconds, larger means slower simulation. Default: %(default)s.",
     )
     parser.add_argument(
-        '--gui',
+        "--gui",
+        "-g",
         action="store_true",
-        default=True,
-        help='Show the GUI display, default: %(default)s.',
+        default=False,
+        help="Show the GUI display (Default: %(default)s)",
     )
     # we could also use vars(parser.parse_args()) to make args a dictionary args['<option>']
     args = parser.parse_args()
 
-    if args.num_cars != len(args.cars_capacity):
-        logging.error(
-            f'Error: number of cars (' + str(args.num_cars) + ') and the length of cars capacity list (' + str(
-                len(args.cars_capacity)) + ') are not equal')
-    else:
-        logging.info(args)
-        main(args)
+    if args.cars != len(args.capacity):
+        logging.warning(
+            f"Car capacity list length ({len(args.capacity)}) does not match number of cars ({args.cars}). Assuming uniform capacity for all cars to: {args.capacity[0]}"
+        )
+        args.capacity = [args.capacity[0]] * args.cars
+
+    logging.info(args)
+    main(args)

@@ -1,17 +1,27 @@
 import logging
 
+
 class Car(object):
     """
     A class to store the floor position (floor) and the max capacity of a elevator
     """
 
-    def __init__(self, id, num_floors, env, target_floor=0, current_floor=0, capacity=1, direction=0):
+    def __init__(
+        self,
+        id,
+        no_floors,
+        env,
+        target_floor=0,
+        current_floor=0,
+        capacity=1,
+        direction=0,
+    ):
         self._id = id
-        self._num_floors = num_floors
+        self._no_floors = no_floors
         self._current_floor = current_floor
         # self._target_floor = target_floor
         self._capacity = capacity
-        self._num_movements = 0
+        self._no_movements = 0
         self._direction = direction
         self._in_people = 0
         self._env = env
@@ -68,9 +78,9 @@ class Car(object):
     def movement(self):
         self._current_floor += self._direction
         logging.info(
-            f"Car {self._id} moves from {self._current_floor - self._direction} to {self._current_floor} at simulation step {self._env.now}")
-        self._num_movements+=1
-
+            f"Car {self._id} moves from {self._current_floor - self._direction} to {self._current_floor} at simulation step {self._env.now}"
+        )
+        self._no_movements += 1
 
     def __str__(self):
-        return f"Car {self._id}: [current floor: {self._current_floor}, direction: {self._direction}, number of people: {self._in_people}, capacity: {self._capacity}, movements: {self._num_movements}]"
+        return f"Car {self._id}: [current floor: {self._current_floor}, direction: {self._direction}, number of people: {self._in_people}, capacity: {self._capacity}, movements: {self._no_movements}]"

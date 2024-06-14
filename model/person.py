@@ -6,17 +6,19 @@ class Person(object):
     """
     This is an object used to model each person in the simulation. Each person has various attributes
     """
+
     population = 0  # This keeps track of how many people have been generated
 
-    def __init__(self, id, num_floors, env):
+    def __init__(self, id, no_floors, env):
 
         self._id = id
 
         # set randomly the current and target floors (excluding the case when both are equals)
-        self._current_floor = random.randint(0, num_floors - 1)
-        self._target_floor = random.randint(0, num_floors - 1)
-        while self._current_floor == self._target_floor: self._target_floor = random.randint(0, num_floors - 1)
-        self._direction = (1 if self._current_floor < self._target_floor else -1)
+        self._current_floor = random.randint(0, no_floors - 1)
+        self._target_floor = random.randint(0, no_floors - 1)
+        while self._current_floor == self._target_floor:
+            self._target_floor = random.randint(0, no_floors - 1)
+        self._direction = 1 if self._current_floor < self._target_floor else -1
         self._in_car = False
         self._id_car = None
         self._arrived = False
@@ -76,8 +78,10 @@ class Person(object):
         return self._env
 
     def __str__(self):
-        return f"Person {self._id}: [current floor: {self._current_floor}, target floor: {self._target_floor}" \
-               f", id car: {self._id_car}, arrived: {self._arrived}, total steps to get goal: {self._wait_time}]"
+        return (
+            f"Person {self._id}: [current floor: {self._current_floor}, target floor: {self._target_floor}"
+            f", id car: {self._id_car}, arrived: {self._arrived}, total steps to get goal: {self._wait_time}]"
+        )
 
     def arriving(self, cars):
         # process when a person arrives
@@ -87,15 +91,22 @@ class Person(object):
             cars[self._id_car].in_people -= 1
             self._in_car = False
             logging.info(
-                f"Person {self._id} arrives on floor {self._current_floor} at simulation step {self._env.now}")
+                f"Person {self._id} arrives on floor {self._current_floor} at simulation step {self._env.now}"
+            )
 
     def getting_in(self, cars):
         # locking for a available car
         if not self._in_car and not self._arrived:
             for car in cars:
-                if car.current_floor == self._current_floor and not car.full and self._direction == car.direction and not self._in_car:
+                if (
+                    car.current_floor == self._current_floor
+                    and not car.full
+                    and self._direction == car.direction
+                    and not self._in_car
+                ):
                     self._in_car = True
                     self._id_car = car.id
                     car.in_people += 1
                     logging.info(
-                        f"Person {self._id} gets in car {self._id_car} in floor {self._current_floor} at simulation step {self._env.now}")
+                        f"Person {self._id} gets in car {self._id_car} in floor {self._current_floor} at simulation step {self._env.now}"
+                    )

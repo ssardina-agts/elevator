@@ -18,7 +18,7 @@ class Baseline(Agent):
         for car in self.state.cars:
             if car.current_floor == 0:
                 actions.append(1)
-            elif car.current_floor == self.state.num_floors - 1:
+            elif car.current_floor == self.state.no_floors - 1:
                 actions.append(-1)
             else:
                 actions.append(car.direction)
@@ -29,7 +29,7 @@ class Random(Agent):
 
     def __init__(self, probability=0.5):
         super().__init__("Random")
-        self._prob=probability
+        self._prob = probability
 
     def next_actions(self):
         """
@@ -40,7 +40,7 @@ class Random(Agent):
         actions = []
         for car in self.state.cars:
             if random() > self._prob:
-                if car.current_floor == self.state.num_floors - 1:
+                if car.current_floor == self.state.no_floors - 1:
                     actions.append(0)
                 else:
                     actions.append(1)
